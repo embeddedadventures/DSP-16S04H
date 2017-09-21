@@ -40,18 +40,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
 #include "DSP16S04H.h"
 #include "Wire.h"
 
-//#define DEBUG_ON
-
-#ifdef DEBUG_ON
-	#define DEBUG(x)		Serial.print(x)
-	#define DEBUG_HEX(x)	Serial.print(x, HEX)
-	#define DEBUGLN(x)		Serial.println(x)
-#else
-	#define DEBUG(x)		
-	#define DEBUG_HEX(x)	
-	#define DEBUGLN(x)		
-#endif
-
 void DSP16S04HClass::clear_data() {
 	data[0] = 0;
 	data[1] = 0;
@@ -109,17 +97,15 @@ void DSP16S04HClass::write_command(uns8 cmd, uns8 arg1) {
 }
 
 void DSP16S04HClass::init() {
-	DEBUGLN("In init function");
 	clear_data();
-	//Wire.begin();
+	Wire.begin();
+	write_command(CMD_BRIGHTNESS, 0xFF);
 }
 
 void DSP16S04HClass::clearDisplay() {
-	DEBUGLN("clearDisplay called");
 	Wire.beginTransmission(DSP16S04H_I2C_ADDR);
 	Wire.write(CMD_CLEAR_DISP);
 	Wire.endTransmission();
-	DEBUGLN("clearDisplay exiting");
 }
 
 void DSP16S04HClass::print(String str) {
@@ -132,17 +118,11 @@ void DSP16S04HClass::print(const char *str) {
 		data[x] = str[x];
 		x++;
 	}
-	DEBUG("printString called. Parameters are:\n");
-	DEBUG("\nData -");
-	DEBUGLN(str);
-	write_command(CMD_PRINT_STR, data[3], data[2], data[1], data[0]);
+	write_command(CMD_PRINT_STR, data[0], data[1], data[2], data[3]);
 }
 
+//Shifts raw data into raw_data buffer at index 0 (from left-most to right-most)
 void DSP16S04HClass::putRaw(uns16 rawData) {
-	
-	DEBUG("putRaw called. Parameters are:\n");
-	DEBUG("\nData -");
-	DEBUGLN(rawData);
 	raw_data[0] = raw_data[1];
 	raw_data[1] = raw_data[2];
 	raw_data[2] = raw_data[3];
@@ -161,24 +141,14 @@ void DSP16S04HClass::putRaw(uns16 rawData) {
 }
 
 void DSP16S04HClass::setDot(uns8 position) {
-	DEBUG("setDot called. Parameters are:\n");
-	DEBUG("\nPosition - ");
-	DEBUGLN(position);
 	write_command(CMD_SET_DOT, position, 0x01);
 }
 
 void DSP16S04HClass::clearDot(uns8 position) {
-	DEBUG("clearDot called. Parameters are:\n");
-	DEBUG("Position - ");
-	DEBUGLN(position);
 	write_command(CMD_CLEAR_DOT, position, 0x00);
 }
 
 void DSP16S04HClass::setBrightness(uns8 bright) {
-
-	DEBUG("setBrightness called. Parameters are:\n");
-	DEBUG("Brightness: ");
-	DEBUGLN(bright);
 	write_command(CMD_BRIGHTNESS, bright);
 }
 

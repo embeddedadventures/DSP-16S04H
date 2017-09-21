@@ -40,64 +40,64 @@ THE POSSIBILITY OF SUCH DAMAGE.
 #include <Wire.h>
 #include <DSP16S04H.h>
 
-char input = 0;
+//#define USING_SAMD21
+
+#ifdef USING_SAMD21
+	#define SERIAL	SerialUSB
+#else
+	#define SERIAL 	Serial
+#endif
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("DSP16S04H test");
-  Wire.begin();
+  SERIAL.begin(115200);
+  while (!SERIAL) {	}
+  SERIAL.println("Welcome to the Embedded Adventures test sketch for the DSP-16S04H display");
+  SERIAL.println("(www.embeddedadventures.com)");
   dsp16s04h.init();
   delay(500);
   dsp16s04h.clearDisplay();
 }
 
 void loop() {
-  if (Serial.available()) {
-    input = Serial.read();
-    if (input == '1') {
-      Serial.println("Test toggle");
-      dsp16s04h.test();
-    }
-    else if (input == '2') {
-      Serial.println("clear");
-      dsp16s04h.clearDisplay();
-    }
-    else if (input == '3') {
-      Serial.println("clear");
-      dsp16s04h.print("1234");
-    }
-    else if (input == '4') {
-      Serial.println("raw");
-      dsp16s04h.putRaw(0xFFFF);
-    }
-    else if (input == '5') {
-      Serial.println("dot");
-      dsp16s04h.setDot(0);
-      delay(250);
-      dsp16s04h.setDot(1);
-      delay(250);
-      dsp16s04h.setDot(2);
-      delay(250);
-      dsp16s04h.setDot(3);
-      delay(250);
-      dsp16s04h.clearDot(0);
-      delay(250);
-      dsp16s04h.clearDot(1);
-      delay(250);
-      dsp16s04h.clearDot(2);
-      delay(250);
-      dsp16s04h.clearDot(3);
-    }
-    else if (input == '6') {
-      Serial.println("brightness");
-      dsp16s04h.putRaw(0xffff);
-      dsp16s04h.putRaw(0xffff);
-      dsp16s04h.putRaw(0xffff);
-      dsp16s04h.putRaw(0xffff);
-      for (uns8 i = 0; i < 0xFF; i++) {
-        dsp16s04h.setBrightness(i);
-        delay(250);
-      }
-    }
+  SERIAL.println("Printing 1234");
+  dsp16s04h.print("1234");
+  delay(1000);
+  dsp16s04h.clearDisplay();
+  delay(1000);
+  
+  SERIAL.println("dot");
+  dsp16s04h.setDot(0);
+  delay(250);
+  dsp16s04h.setDot(1);
+  delay(250);
+  dsp16s04h.setDot(2);
+  delay(250);
+  dsp16s04h.setDot(3);
+  delay(250);
+  dsp16s04h.clearDot(0);
+  delay(250);
+  dsp16s04h.clearDot(1);
+  delay(250);
+  dsp16s04h.clearDot(2);
+  delay(250);
+  dsp16s04h.clearDot(3);
+  
+  dsp16s04h.clearDisplay();
+  delay(500);
+  
+  SERIAL.println("raw and brightness");
+  dsp16s04h.putRaw(0xFFF0);
+  delay(250);
+  dsp16s04h.putRaw(0xFF0F);
+  delay(250);
+  dsp16s04h.putRaw(0xF0FF);
+  delay(250);
+  dsp16s04h.putRaw(0xFFFF);
+  delay(250);
+  for (uns8 i = 1; i < 0xFF; i++) {
+	dsp16s04h.setBrightness(i);
+	delay(50);
   }
+  dsp16s04h.clearDisplay();
+  delay(500);
 }
